@@ -1,0 +1,40 @@
+﻿<Window x:Class="Lab1_Gamming_Srammbling.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab1_Gamming_Srammbling"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="550" Width="700">
+    <Grid Margin="0,0,0,6" Loaded="Grid_Loaded">
+        <TextBox x:Name="Text" HorizontalAlignment="Left" Margin="47,126,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="331" Height="52"/>
+        <TextBox x:Name="Key" HorizontalAlignment="Left" Margin="47,246,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="331" Height="50"/>
+        <TextBox x:Name="Chiphrtext" HorizontalAlignment="Left" Margin="47,345,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="330" Height="50"/>
+        <ComboBox x:Name="TextFormat" HorizontalAlignment="Left" Margin="47,44,0,0" VerticalAlignment="Top" Width="127" SelectedIndex="0" DropDownClosed="TextFormat_DropDownClosed" DropDownOpened="TextFormat_DropDownOpened">
+            <TextBlock>Text</TextBlock>
+            <TextBlock>Binary</TextBlock>
+            <TextBlock>Hexadecimal</TextBlock>
+        </ComboBox>
+        <Button x:Name="CiphButton" Content="Преобразовать" HorizontalAlignment="Left" Margin="49,415,0,0" VerticalAlignment="Top" Click="CiphButton_Click"/>
+        <Button x:Name="FileLoad" Content="Получить данные из файла" HorizontalAlignment="Left" Margin="163,452,0,0" VerticalAlignment="Top" Click="FileLoad_Click"/>
+        <ComboBox x:Name="KeyType" HorizontalAlignment="Left" Margin="243,80,0,0" VerticalAlignment="Top" Width="134" SelectedIndex="0" DropDownClosed="KeyType_DropDownClosed">
+            <TextBlock>Случайный Ключ</TextBlock>
+            <TextBlock>Скрэмблер</TextBlock>
+        </ComboBox>
+        <Button x:Name="UpdateKey" Content="Обновить ключ" HorizontalAlignment="Left" Margin="286,215,0,0" VerticalAlignment="Top" Click="UpdateKey_Click"/>
+        <Button x:Name="SaveFile" Content="Сохранить данные в файл" HorizontalAlignment="Left" Margin="163,415,0,0" VerticalAlignment="Top" Width="154" Click="SaveFile_Click"/>
+        <Label Content="Текст" HorizontalAlignment="Left" Margin="49,91,0,0" VerticalAlignment="Top"/>
+        <Label Content="Ключ" HorizontalAlignment="Left" Margin="47,207,0,0" VerticalAlignment="Top"/>
+        <Label Content="Шифротекст" HorizontalAlignment="Left" Margin="47,314,0,0" VerticalAlignment="Top"/>
+        <Label Content="Формат данных" HorizontalAlignment="Left" Margin="49,9,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ScramFormat" HorizontalAlignment="Left" Margin="463,80,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="142" Height="24" TextChanged="ScramFormat_TextChanged"/>
+        <TextBox x:Name="ScramStart" HorizontalAlignment="Left" Margin="463,140,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="142" Height="24"/>
+        <Label Content="Параметры скрэмблера" HorizontalAlignment="Left" Margin="463,44,0,0" VerticalAlignment="Top"/>
+        <Label Content="Начальное значение скрэмблера" HorizontalAlignment="Left" Margin="463,108,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ScramFormat_Copy" HorizontalAlignment="Left" Margin="463,230,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="142" Height="24"/>
+        <TextBox x:Name="ScramStart_Copy" HorizontalAlignment="Left" Margin="463,290,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="142" Height="24"/>
+        <Label Content="Параметры скрэмблера" HorizontalAlignment="Left" Margin="463,194,0,0" VerticalAlignment="Top"/>
+        <Label Content="Начальное значение скрэмблера" HorizontalAlignment="Left" Margin="463,258,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
