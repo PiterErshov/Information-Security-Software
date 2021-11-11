@@ -271,7 +271,6 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             for (int i = 0; i < inp.Length; i++)
                 buff5[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
 
-
             return (buff1, buff2, buff3, buff4, buff5);
         }
         //*/

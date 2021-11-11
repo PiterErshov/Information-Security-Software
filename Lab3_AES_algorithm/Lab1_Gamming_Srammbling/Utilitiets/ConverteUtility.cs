@@ -215,5 +215,6 @@ namespace Lab1_Gamming_Srammbling.Utilitiets
             }
             return s.ToString();
         }
+
     }
 }
