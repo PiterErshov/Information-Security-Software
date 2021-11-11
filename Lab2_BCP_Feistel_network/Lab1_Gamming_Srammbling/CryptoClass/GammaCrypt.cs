@@ -111,48 +111,77 @@ namespace Lab2_BCP_Feistel_network.CryptoClass
             (text.Take(text.Length / 2).ToArray(), text.Skip(text.Length / 2).ToArray());
 
 
-        public static byte[] FS_function(byte[] halfKey, byte[] left_block)
+        public static byte[] FS_function(string key, byte[] left_block)
         {
             var Sxor = new byte[left_block.Length];
-            new BitArray(halfKey).Xor(new BitArray(left_block)).CopyTo(Sxor, 0);
+            var bb = BitConverter.ToUInt16(ShiftKey(key, 0, 8), 0);
+            var start = Convert.ToUInt32(bb);
+            var ublock = ScammblerClass.LFSR_one(start, 0);
+            var roundKey = ConverteUtility.ConvertBinaryStrToByte(ConverteUtility.GetScramKey(ublock));
+            new BitArray(roundKey).Xor(new BitArray(left_block)).CopyTo(Sxor, 0);
             return Sxor;
         }
 
-
-
-        public static byte[] F_function(byte[] halfKey, byte[] left_block) => halfKey;
-
-        public static byte[] ShiftKey(string key, int i)
+        public static byte[] ShiftKey(string key, int i, int lenght = 32)
         {
-            var half = new byte[key.Length];
+            string halfKey = "";
+            int j = 0;
 
-            return half;
+            while(j < lenght)
+            {
+                if (i == key.Length)
+                    i = 0;
+                halfKey += key[i];
+                i++;
+                j++;
+            }
+
+            return ConverteUtility.ConvertBinaryStrToByte(halfKey);
         }
 
-        public static byte[] Feistel_Network(byte[] text, uint start, int keytype = 0, int funktype = 0)
+        public static byte[] Feistel_Network(byte[] text, string key, int keytype = 0, int funktype = 0)
         {
             var chiphrText = new byte[text.Length];
-
+            uint start;
             for (int i = 0; i < text.Length; i += 8)
             {                
                 var block = text.Skip(i).ToArray().Take(8).ToArray();
                 var halfBlocks = GetHalfs(block);
                 var right = new byte[halfBlocks.second.Length];
-                var left = new byte[halfBlocks.first.Length];
+                var left = new byte[halfBlocks.first.Length];                
                 for (int j = 0; j < SyclLenght; j++)
                 {
+                    var roundKey = new byte[block.Length];
                     var buff = new byte[halfBlocks.second.Length];
                     if (keytype == 0)
                     {
-
+                        roundKey = ShiftKey(key, j);
+                    } 
+                    else
+                    {
+                        var bb = BitConverter.ToUInt16(ShiftKey(key, j, 8), 0);
+                        start = Convert.ToUInt32(bb);
+                        var ublock = ScammblerClass.LFSR_one(start, 0);
+                        roundKey = ConverteUtility.ConvertBinaryStrToByte(ConverteUtility.GetScramKey(ublock));
                     }
-                      
-                   
+                    if(funktype == 0)
+                    {
+                        buff = left;                        
+                        new BitArray(roundKey).Xor(new BitArray(right)).CopyTo(left, 0);
+                        right = buff;
+                    }
+                    else
+                    {
+                        buff = left;
+                        var FS = FS_function(key, left);
+                        new BitArray(FS).Xor(new BitArray(right)).CopyTo(left, 0);
+                        right = buff;
+                    }                     
                 }
+                Array.Copy(left, 0, chiphrText, i, left.Length);
+                Array.Copy(right, 0, chiphrText, i + 8, right.Length);
             }
-
             return chiphrText;
-
         }
 
     }
