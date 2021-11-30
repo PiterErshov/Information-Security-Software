@@ -234,6 +234,8 @@ namespace Lab1_Gamming_Srammbling
             }
         }
 
+
+
         private void ChiphrMod_DropDownClosed(object sender, EventArgs e)
         {
             if(ChiphrMod.Text == "BC")
