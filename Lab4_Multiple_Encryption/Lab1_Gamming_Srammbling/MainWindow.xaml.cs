@@ -21,12 +21,34 @@ namespace Lab1_Gamming_Srammbling
         private string TextFile = "Text.json";
         private string KeyFile = "Key.json";
         private string ChiphrFile = "ChiphrText.json";
-        private string ScramFile = "ScramStart.json";
-        private string ScramblerKey = "";
+        private string Chiphrmod = "BC";
         private byte[] TextArray = null;
         private byte[] KeyArray = null;
         private byte[] ChiphrArray = null;
         private byte[] IVArray = null;
+        private byte[] SecKeyArray = null;
+        private bool Flag = true;
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            SecKey.Visibility = Visibility.Hidden;
+            SecKey.IsEnabled = false;
+            SecKeyLabel.Visibility = Visibility.Hidden;
+            SecKeyLabel.IsEnabled = false;
+            UpdateSecKey.Visibility = Visibility.Hidden;
+            UpdateSecKey.IsEnabled = false;
+            if (Flag == true)
+            {
+                ChiphrLabel.Margin = new Thickness(ChiphrLabel.Margin.Left, ChiphrLabel.Margin.Top - 100, ChiphrLabel.Margin.Right, ChiphrLabel.Margin.Bottom);
+                Chiphrtext.Margin = new Thickness(Chiphrtext.Margin.Left, Chiphrtext.Margin.Top - 100, Chiphrtext.Margin.Right, Chiphrtext.Margin.Bottom);
+                CiphButton.Margin = new Thickness(CiphButton.Margin.Left, CiphButton.Margin.Top - 100, CiphButton.Margin.Right, CiphButton.Margin.Bottom);
+                DeciphButton.Margin = new Thickness(DeciphButton.Margin.Left, DeciphButton.Margin.Top - 100, DeciphButton.Margin.Right, DeciphButton.Margin.Bottom);
+                SaveFile.Margin = new Thickness(SaveFile.Margin.Left, SaveFile.Margin.Top - 100, SaveFile.Margin.Right, SaveFile.Margin.Bottom);
+                FileLoad.Margin = new Thickness(FileLoad.Margin.Left, FileLoad.Margin.Top - 100, FileLoad.Margin.Right, FileLoad.Margin.Bottom);
+                LoadChiphFile.Margin = new Thickness(LoadChiphFile.Margin.Left, LoadChiphFile.Margin.Top - 100, LoadChiphFile.Margin.Right, LoadChiphFile.Margin.Bottom);
+                Flag = false;
+            }
+        }
 
         private void TextFormat_DropDownClosed(object sender, EventArgs e)
         {
@@ -75,7 +97,7 @@ namespace Lab1_Gamming_Srammbling
 
         private void CiphButton_Click(object sender, RoutedEventArgs e)
         {
-            var encryptResults = AESClass.Converter(TextArray, KeyArray, TextFormat.Text, "encrypt", IVArray);
+            var encryptResults = AESClass.Converter(TextArray, KeyArray, TextFormat.Text, "encrypt", Chiphrmod, IVArray, SecKeyArray);
             ChiphrArray = encryptResults.chipout;
             if (encryptResults.code == 0)
                 Chiphrtext.Text = encryptResults.output;          
@@ -88,24 +110,20 @@ namespace Lab1_Gamming_Srammbling
         private void UpdateKey_Click(object sender, RoutedEventArgs e)
         {
             KeyArray = AESClass.RandKey();
-            if (KeyFormarFlag == "Rand")
+
+            if (TextFormat.Text == "Text")
             {
-                if (TextFormat.Text == "Text")
-                {
-                    Key.Text = ConverteUtility.ConvertByteArrayToString(AESClass.RandKey());
-                }
-                if (TextFormat.Text == "Binary")
-                {
-                    Key.Text = ConverteUtility.ConvertByteArraToBinaryStr(AESClass.RandKey());
-                }
-                if (TextFormat.Text == "Hexadecimal")
-                {
-                    Key.Text = ConverteUtility.ByteArrayToHexString(AESClass.RandKey());
-                }
-            }           
+                Key.Text = ConverteUtility.ConvertByteArrayToString(AESClass.RandKey());
+            }
+            if (TextFormat.Text == "Binary")
+            {
+                Key.Text = ConverteUtility.ConvertByteArraToBinaryStr(AESClass.RandKey());
+            }
+            if (TextFormat.Text == "Hexadecimal")
+            {
+                Key.Text = ConverteUtility.ByteArrayToHexString(AESClass.RandKey());
+            }
         }
-
-
 
         private void SaveFile_Click(object sender, RoutedEventArgs e)
         {
@@ -152,7 +170,7 @@ namespace Lab1_Gamming_Srammbling
             TextArray = ChiphrArray;
             Chiphrtext.Clear();
 
-            var encryptResults = AESClass.Converter(TextArray, KeyArray, TextFormat.Text, "decryt", IVArray);
+            var encryptResults = AESClass.Converter(TextArray, KeyArray, TextFormat.Text, "decryt", Chiphrmod, IVArray, SecKeyArray);
             if (encryptResults.code == 0)
                 Chiphrtext.Text = encryptResults.output;            
             if (encryptResults.code == 2)
@@ -170,20 +188,6 @@ namespace Lab1_Gamming_Srammbling
             var key = FileUtility.DeserializeString<KeyModel>(FileUtility.JSONSrt(KeyFile));
             Text.Text = chiphr.Chiphr;
             Key.Text = key.Key;
-        }
-
-        private void AESRUN_Click(object sender, RoutedEventArgs e)
-        {
-            var text = ConverteUtility.HexStringToByteArray(AESText.Text);
-            var key = ConverteUtility.HexStringToByteArray(AESKey.Text);
-
-            var output = AESClass.OneRound(text, key);
-
-            S1.Text = ConverteUtility.ByteArrayToHexString(output.s1);
-            S2.Text = ConverteUtility.ByteArrayToHexString(output.s2);
-            S3.Text = ConverteUtility.ByteArrayToHexString(output.s3);
-            S4.Text = ConverteUtility.ByteArrayToHexString(output.s4);
-            S5.Text = ConverteUtility.ByteArrayToHexString(output.s5);
         }
 
         private void Text_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -215,6 +219,87 @@ namespace Lab1_Gamming_Srammbling
         private void UpdateIV_Click(object sender, RoutedEventArgs e)
         {
             IVArray = AESClass.RandKey();
+
+            if (TextFormat.Text == "Text")
+            {
+                IV.Text = ConverteUtility.ConvertByteArrayToString(IVArray);
+            }
+            if (TextFormat.Text == "Binary")
+            {
+                IV.Text = ConverteUtility.ConvertByteArraToBinaryStr(IVArray);
+            }
+            if (TextFormat.Text == "Hexadecimal")
+            {
+                IV.Text = ConverteUtility.ByteArrayToHexString(IVArray);
+            }
+        }
+
+
+
+        private void ChiphrMod_DropDownClosed(object sender, EventArgs e)
+        {
+            if(ChiphrMod.Text == "BC")
+            {
+                SecKey.Visibility = Visibility.Hidden;
+                SecKey.IsEnabled = false;
+                SecKeyLabel.Visibility = Visibility.Hidden;
+                SecKeyLabel.IsEnabled = false;
+                UpdateSecKey.Visibility = Visibility.Hidden;
+                UpdateSecKey.IsEnabled = false;
+                if (Flag == true)
+                {
+                    ChiphrLabel.Margin = new Thickness(ChiphrLabel.Margin.Left, ChiphrLabel.Margin.Top - 100, ChiphrLabel.Margin.Right, ChiphrLabel.Margin.Bottom);
+                    Chiphrtext.Margin = new Thickness(Chiphrtext.Margin.Left, Chiphrtext.Margin.Top - 100, Chiphrtext.Margin.Right, Chiphrtext.Margin.Bottom);
+                    CiphButton.Margin = new Thickness(CiphButton.Margin.Left, CiphButton.Margin.Top - 100, CiphButton.Margin.Right, CiphButton.Margin.Bottom);
+                    DeciphButton.Margin = new Thickness(DeciphButton.Margin.Left, DeciphButton.Margin.Top - 100, DeciphButton.Margin.Right, DeciphButton.Margin.Bottom);
+                    SaveFile.Margin = new Thickness(SaveFile.Margin.Left, SaveFile.Margin.Top - 100, SaveFile.Margin.Right, SaveFile.Margin.Bottom);
+                    FileLoad.Margin = new Thickness(FileLoad.Margin.Left, FileLoad.Margin.Top - 100, FileLoad.Margin.Right, FileLoad.Margin.Bottom);
+                    LoadChiphFile.Margin = new Thickness(LoadChiphFile.Margin.Left, LoadChiphFile.Margin.Top - 100, LoadChiphFile.Margin.Right, LoadChiphFile.Margin.Bottom);
+                    Flag = false;
+                }
+            }
+            else
+            {
+                SecKey.Visibility = Visibility.Visible;
+                SecKey.IsEnabled = true;
+                SecKeyLabel.Visibility = Visibility.Visible;
+                SecKeyLabel.IsEnabled = true;
+                UpdateSecKey.Visibility = Visibility.Visible;
+                UpdateSecKey.IsEnabled = true;
+                if (Flag == false)
+                {
+                    ChiphrLabel.Margin = new Thickness(ChiphrLabel.Margin.Left, ChiphrLabel.Margin.Top + 100, ChiphrLabel.Margin.Right, ChiphrLabel.Margin.Bottom);
+                    Chiphrtext.Margin = new Thickness(Chiphrtext.Margin.Left, Chiphrtext.Margin.Top + 100, Chiphrtext.Margin.Right, Chiphrtext.Margin.Bottom);
+                    CiphButton.Margin = new Thickness(CiphButton.Margin.Left, CiphButton.Margin.Top + 100, CiphButton.Margin.Right, CiphButton.Margin.Bottom);
+                    DeciphButton.Margin = new Thickness(DeciphButton.Margin.Left, DeciphButton.Margin.Top + 100, DeciphButton.Margin.Right, DeciphButton.Margin.Bottom);
+                    SaveFile.Margin = new Thickness(SaveFile.Margin.Left, SaveFile.Margin.Top + 100, SaveFile.Margin.Right, SaveFile.Margin.Bottom);
+                    FileLoad.Margin = new Thickness(FileLoad.Margin.Left, FileLoad.Margin.Top + 100, FileLoad.Margin.Right, FileLoad.Margin.Bottom);
+                    LoadChiphFile.Margin = new Thickness(LoadChiphFile.Margin.Left, LoadChiphFile.Margin.Top + 100, LoadChiphFile.Margin.Right, LoadChiphFile.Margin.Bottom);
+                    Flag = true;
+                }
+            }
+        }
+
+        private void TextFormat_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void UpdateSecKey_Click(object sender, RoutedEventArgs e)
+        {
+            SecKeyArray = AESClass.RandKey();
+            if (TextFormat.Text == "Text")
+            {
+                SecKey.Text = ConverteUtility.ConvertByteArrayToString(SecKeyArray);
+            }
+            if (TextFormat.Text == "Binary")
+            {
+                SecKey.Text = ConverteUtility.ConvertByteArraToBinaryStr(SecKeyArray);
+            }
+            if (TextFormat.Text == "Hexadecimal")
+            {
+                SecKey.Text = ConverteUtility.ByteArrayToHexString(SecKeyArray);
+            }
         }
     }
 }

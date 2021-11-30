@@ -275,7 +275,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return r;
         }
 
-        public static byte[] encryptBloc(byte[] inp)
+        public static byte[] encryptBloc(byte[] inp, byte[,] w_k)
         {
             byte[] tmp = new byte[inp.Length];
 
@@ -286,17 +286,17 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             for (int i = 0; i < inp.Length; i++)
                 state[i / 4, i % 4] = inp[i % 4 * 4 + i / 4];
 
-            state = AddRoundKey(state, w, 0);
+            state = AddRoundKey(state, w_k, 0);
             for (int round = 1; round < Nr; round++)
             {
                 state = SubBytes(state);
                 state = ShiftRows(state);
                 state = MixColumns(state);
-                state = AddRoundKey(state, w, round);
+                state = AddRoundKey(state, w_k, round);
             }
             state = SubBytes(state);
             state = ShiftRows(state);
-            state = AddRoundKey(state, w, Nr);
+            state = AddRoundKey(state, w_k, Nr);
 
             for (int i = 0; i < tmp.Length; i++)
                 tmp[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
@@ -304,7 +304,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return tmp;
         }
 
-        public static byte[] decryptBloc(byte[] inp)
+        public static byte[] decryptBloc(byte[] inp, byte[,] w_k)
         {
             byte[] tmp = new byte[inp.Length];
 
@@ -313,18 +313,18 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             for (int i = 0; i < inp.Length; i++)
                 state[i / 4, i % 4] = inp[i % 4 * 4 + i / 4];
 
-            state = AddRoundKey(state, w, Nr);
+            state = AddRoundKey(state, w_k, Nr);
             for (int round = Nr - 1; round >= 1; round--)
             {
                 state = InvSubBytes(state);
                 state = InvShiftRows(state);
-                state = AddRoundKey(state, w, round);
+                state = AddRoundKey(state, w_k, round);
                 state = InvMixColumns(state);
 
             }
             state = InvSubBytes(state);
             state = InvShiftRows(state);
-            state = AddRoundKey(state, w, 0);
+            state = AddRoundKey(state, w_k, 0);
 
             for (int i = 0; i < tmp.Length; i++)
                 tmp[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
@@ -374,7 +374,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return (buff1, buff2, buff3, buff4, buff5);
         }
 
-        public static byte[] encrypt(byte[] inp, byte[] key, byte[] iv = null)
+        public static byte[] encryptBC(byte[] inp, byte[] key, byte[] iv = null)
         {
             Nb = 4;
             Nk = key.Length / 4;
@@ -397,7 +397,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             Array.Copy(iv, 0, f_array, 0, iv.Length);
 
 
-            w = generateSubkeys(key);
+            var w_k = generateSubkeys(key);
 
             int count = 0;
 
@@ -406,7 +406,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
                 if (i > 0 && i % 16 == 0)
                 {
                     var xorbloc = xor_func(bloc, f_array);
-                    bloc = encryptBloc(xorbloc);
+                    bloc = encryptBloc(xorbloc, w_k);
                     Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
                     f_array = xor_func(bloc, f_array);
                 }
@@ -421,7 +421,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             if (bloc.Length == 16)
             {
                 var xorbloc = xor_func(bloc, f_array);
-                bloc = encryptBloc(xorbloc);
+                bloc = encryptBloc(xorbloc, w_k);
                 Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
                 f_array = xor_func(bloc, f_array);
             }
@@ -429,7 +429,44 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return tmp;
         }
 
-        public static byte[] encrypt2(byte[] inp, byte[] key, string blockmod = "non", byte[] iv = null)
+
+        public static byte[] decryptBC(byte[] inp, byte[] key, byte[] iv = null)
+        {
+            int i;
+            byte[] tmp = new byte[inp.Length];
+            byte[] bloc = new byte[16];
+
+            Nb = 4;
+            Nk = key.Length / 4;
+            Nr = Nk + 6;
+            var w_k = generateSubkeys(key);
+
+            byte[] f_array = new byte[16];
+            Array.Copy(iv, 0, f_array, 0, iv.Length);
+
+            for (i = 0; i < inp.Length; i++)
+            {
+                if (i > 0 && i % 16 == 0)
+                {
+                    var bloc_d = decryptBloc(bloc, w_k);
+                    var xorbloc = xor_func(bloc_d, f_array);
+                    Array.Copy(xorbloc, 0, tmp, i - 16, bloc.Length);
+                    f_array = xor_func(bloc, f_array);
+                }
+                if (i < inp.Length)
+                    bloc[i % 16] = inp[i];
+            }
+
+            bloc = decryptBloc(bloc, w_k);
+            var x = xor_func(bloc, f_array);
+            Array.Copy(x, 0, tmp, i - 16, bloc.Length);
+
+            //tmp = deletePadding(tmp);
+
+            return tmp;
+        }
+
+        public static byte[] encryptDevisPrice(byte[] inp, byte[] key, byte[] iv = null, byte[] key2 = null)
         {
             Nb = 4;
             Nk = key.Length / 4;
@@ -452,7 +489,8 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             Array.Copy(iv, 0, f_array, 0, iv.Length);
 
 
-            w = generateSubkeys(key);
+            var w_k = generateSubkeys(key);
+            var w_k_sec = generateSubkeys(key2);
 
             int count = 0;
 
@@ -460,15 +498,11 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             {
                 if (i > 0 && i % 16 == 0)
                 {
-                    if (blockmod == "non")
-                        bloc = encryptBloc(bloc);
-                    else
-                    {
-                        var xorbloc = xor_func(bloc, f_array);
-                        bloc = encryptBloc(xorbloc);
-                    }
-                    Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
-                    f_array = xor_func(bloc, f_array);
+                    var bloc_first = encryptBloc(f_array, w_k);
+                    var xorbloc = xor_func(bloc_first, bloc);
+                    var bloc_second = encryptBloc(xorbloc, w_k_sec);
+                    Array.Copy(bloc_second, 0, tmp, i - 16, bloc.Length);
+                    Array.Copy(bloc_second, 0, f_array, 0, bloc.Length);
                 }
                 if (i < inp.Length)
                     bloc[i % 16] = inp[i];
@@ -480,16 +514,19 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             }
             if (bloc.Length == 16)
             {
-                var xorbloc = xor_func(bloc, f_array);
-                bloc = encryptBloc(xorbloc);
-                Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
-                f_array = xor_func(bloc, f_array);
+                var bloc_first = encryptBloc(f_array, w_k);
+                var xorbloc = xor_func(bloc_first, bloc);
+                var bloc_second = encryptBloc(xorbloc, w_k_sec);
+                Array.Copy(bloc_second, 0, tmp, i - 16, bloc.Length);
+                Array.Copy(bloc_second, 0, f_array, 0, bloc.Length);
             }
 
             return tmp;
         }
 
-        public static byte[] decrypt(byte[] inp, byte[] key, byte[] iv = null)
+
+
+        public static byte[] decryptDevisPrice(byte[] inp, byte[] key, byte[] iv = null, byte[] key2 = null)
         {
             int i;
             byte[] tmp = new byte[inp.Length];
@@ -498,7 +535,8 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             Nb = 4;
             Nk = key.Length / 4;
             Nr = Nk + 6;
-            w = generateSubkeys(key);
+            var w_k = generateSubkeys(key);
+            var w_k_sec = generateSubkeys(key2);
 
             byte[] f_array = new byte[16];
             Array.Copy(iv, 0, f_array, 0, iv.Length);
@@ -507,20 +545,19 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             {
                 if (i > 0 && i % 16 == 0)
                 {
-                    var bloc_d = decryptBloc(bloc);
-                    var xorbloc = xor_func(bloc_d, f_array);
+                    var bloc_second = decryptBloc(bloc, w_k_sec);
+                    var bloc_first = encryptBloc(f_array, w_k);
+                    var xorbloc = xor_func(bloc_second, bloc_first);
                     Array.Copy(xorbloc, 0, tmp, i - 16, bloc.Length);
-                    f_array = xor_func(bloc, f_array);
+                    Array.Copy(bloc, 0, f_array, 0, bloc.Length);
                 }
                 if (i < inp.Length)
                     bloc[i % 16] = inp[i];
             }
-                        
-            bloc = decryptBloc(bloc);
-            var x = xor_func(bloc, f_array);
+            var bloc_s = decryptBloc(bloc, w_k_sec);
+            var bloc_f = encryptBloc(f_array, w_k);
+            var x = xor_func(bloc_f, bloc_s);
             Array.Copy(x, 0, tmp, i - 16, bloc.Length);
-
-            //tmp = deletePadding(tmp);
 
             return tmp;
         }
@@ -541,7 +578,8 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return tmp;
         }
 
-        public static (string output, int code, byte[] chipout) Converter(byte[] Text, byte[] Key, string flag = "Text", string type = "encrypt", byte[] iv = null) //Универсальный преобразователь
+        public static (string output, int code, byte[] chipout) Converter(byte[] Text, byte[] Key, string flag = "Text",
+                       string type = "encrypt", string mod = "BC", byte[] iv = null, byte[] skey = null) //Универсальный преобразователь
         {
             string chiphrtext = "";
             int code = 0;
@@ -550,9 +588,19 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             if (flag == "Text")
             {
                 if (type == "encrypt")
-                    tt = encrypt(Text, Key, iv);
+                {
+                    if (mod == "BC")
+                        tt = encryptBC(Text, Key, iv);
+                    else
+                        tt = encryptDevisPrice(Text, Key, iv, skey);
+                }
                 else
-                    tt = decrypt(Text, Key, iv);
+                {
+                    if (mod == "BC")
+                        tt = decryptBC(Text, Key, iv);
+                    else
+                        tt = decryptDevisPrice(Text, Key, iv, skey);
+                }
                 chiphrtext = ConverteUtility.ConvertByteArrayToString(tt);
 
             }
@@ -560,18 +608,38 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             if (flag == "Binary")
             {
                 if (type == "encrypt")
-                    tt = encrypt(Text, Key, iv);
+                {
+                    if (mod == "BC")
+                        tt = encryptBC(Text, Key, iv);
+                    else
+                        tt = encryptDevisPrice(Text, Key, iv, skey);
+                }
                 else
-                    tt = decrypt(Text, Key, iv);
+                {
+                    if (mod == "BC")
+                        tt = decryptBC(Text, Key, iv);
+                    else
+                        tt = decryptDevisPrice(Text, Key, iv, skey);
+                }
                 chiphrtext = ConverteUtility.ConvertByteArraToBinaryStr(tt);
 
             }
             if (flag == "Hexadecimal")
             {
                 if (type == "encrypt")
-                    tt = encrypt(Text, Key, iv);
+                {
+                    if (mod == "BC")
+                        tt = encryptBC(Text, Key, iv);
+                    else
+                        tt = encryptDevisPrice(Text, Key, iv, skey);
+                }
                 else
-                    tt = decrypt(Text, Key, iv);
+                {
+                    if (mod == "BC")
+                        tt = decryptBC(Text, Key, iv);
+                    else
+                        tt = decryptDevisPrice(Text, Key, iv, skey);
+                }
                 chiphrtext = ConverteUtility.ByteArrayToHexString(tt);
             }
             return (chiphrtext, code, tt);
