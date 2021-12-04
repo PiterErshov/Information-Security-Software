@@ -4,9 +4,13 @@ using Lab1_Gamming_Srammbling.Utilitiets;
 using System;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using LiveCharts;
+using LiveCharts.Wpf;
+using LiveCharts.Defaults;
 
 namespace Lab1_Gamming_Srammbling
 {
@@ -37,6 +41,7 @@ namespace Lab1_Gamming_Srammbling
         private byte[] EffectKey = null;
         private byte[] EffectIV = null;
         private byte[] EffectSecKey = null;
+        private List<int> ChangedBitsList = new List<int>();
         private int KeyLenght = 16;
         private bool Flag = true;
 
@@ -340,19 +345,17 @@ namespace Lab1_Gamming_Srammbling
         {
             var first = AESClass.encryptBCEffect(EffectText, KeyArray, IVArray);
             var second = AESClass.encryptBCEffect(NewText, KeyArray, IVArray);
+            ChangedBitsList.Clear();
             
-            //*
-            for(int i = 0; i < first.changedBitsBlock.Count; i++)
+            for (int i = 0; i < first.changedBitsBlock.Count; i++)
             { 
                 for(int j = 0; j < first.changedBitsBlock.ElementAt(i).Count; j++)
                 {
                     var oldText = first.changedBitsBlock.ElementAt(i).ElementAt(j).ToArray();
                     var newText = second.changedBitsBlock.ElementAt(i).ElementAt(j).ToArray();
-                    ListOfChanges.Text += AESClass.ChangedBits(oldText, newText).ToString() + " ";
+                    ChangedBitsList.Add(AESClass.ChangedBits(oldText, newText));
                 }
-                ListOfChanges.Text += "\n";
             }
-            //*/
         }
 
         private void ModBlocks_Click(object sender, RoutedEventArgs e)
@@ -368,38 +371,48 @@ namespace Lab1_Gamming_Srammbling
             EffectIV = ConverteUtility.ConvertBinaryStrToByte(IVEffect.Text);
             EffectKey = ConverteUtility.ConvertBinaryStrToByte(KeyEffect.Text);
         }
-
-        void UpdateBackPattern(object sender, SizeChangedEventArgs e)
-        {
-            var w = Background.ActualWidth;
-            var h = Background.ActualHeight;
-
-            Background.Children.Clear();
-            for (int x = 10; x < w; x += 10)
-                AddLineToBackground(x, 0, x, h);
-            for (int y = 10; y < h; y += 10)
-                AddLineToBackground(0, y, w, y);
-        }
-
-        void AddLineToBackground(double x1, double y1, double x2, double y2)
-        {
-            var line = new Line()
-            {
-                X1 = x1,
-                Y1 = y1,
-                X2 = x2,
-                Y2 = y2,
-                Stroke = Brushes.Black,
-                StrokeThickness = 1,
-                SnapsToDevicePixels = true
-            };
-            line.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
-            Background.Children.Add(line);
-        }
+        
+        public SeriesCollection SeriesCollection { get; set; }
+        public Func<double, string> Test { get; set; }
 
         private void Test1_Click(object sender, RoutedEventArgs e)
         {
-            AddLineToBackground(100, 100, 0, 0);
+            DataContext = null;
+            var v1 = new ChartValues<ObservablePoint>();
+            var v2 = new ChartValues<ObservablePoint>();
+            var v3 = new ChartValues<ObservablePoint>();
+
+            for(int i = 0; i < 16; i++)
+            {
+                v1.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i)));
+                v2.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i + 16)));
+                v3.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i + 32)));
+            }
+
+            SeriesCollection = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Values = v1,
+                    Stroke = Brushes.Red,
+                    Title = "Block 1"                    
+                },
+
+                new LineSeries
+                {
+                    Values = v2,
+                    Stroke = Brushes.Green,
+                    Title = "Block 2"
+                },
+
+                new LineSeries
+                {
+                    Values = v3,
+                    Stroke = Brushes.Blue,
+                    Title = "Block 3"
+                }
+            };
+            DataContext = this;
         }
     }
 }

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:Lab1_Gamming_Srammbling"
         mc:Ignorable="d"
         Title="MainWindow" Height="900" Width="1600">
@@ -52,12 +53,8 @@
         <Label Content="Блок 2" HorizontalAlignment="Left" Margin="492,120,0,0" VerticalAlignment="Top"/>
         <Label Content="Блок 3" HorizontalAlignment="Left" Margin="491,200,0,0" VerticalAlignment="Top"/>
         <Button x:Name="ModBlocks" Content="Модифицировать данные" HorizontalAlignment="Left" Margin="919,300,0,0" VerticalAlignment="Top" Width="155" Click="ModBlocks_Click"/>
-        <Grid x:Name="GraphGrid" Margin="919,372,33,35">
-            <Canvas x:Name="Background"
-            Width="{Binding ActualWidth, ElementName=MainCanvas}"
-            Height="{Binding ActualHeight, ElementName=MainCanvas}"
-            SizeChanged="UpdateBackPattern"/>
-            <Canvas x:Name="MainCanvas"/>
+        <Grid x:Name="GraphGrid" Margin="919,372,70,75">
+            <lvc:CartesianChart x:Name="ChartBlock" Series="{Binding SeriesCollection}" LegendLocation="Right" Margin="0,0,10,19"/>
         </Grid>
         <Button x:Name="Test1" Content="Button" HorizontalAlignment="Left" Margin="1338,306,0,0" VerticalAlignment="Top" Click="Test1_Click"/>
 
