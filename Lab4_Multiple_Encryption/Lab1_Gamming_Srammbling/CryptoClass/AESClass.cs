@@ -83,10 +83,10 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
         0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb };
 
 
-        public static byte[] RandKey() 
+        public static byte[] RandKey(int N) 
         {
             Random rnd = new Random((int)DateTime.Now.Ticks);
-            var bt = new Byte[KeyLenght];
+            var bt = new Byte[N];
             rnd.NextBytes(bt);
             return bt;
         }
@@ -332,10 +332,10 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return tmp;
         }
 
-        public static (byte[] output, List<int> changedBits) encryptBlocEffect(byte[] inp, byte[,] w_k)
+        public static (byte[] output, List<List<byte>> changedBits) encryptBlocEffect(byte[] inp, byte[,] w_k)
         {
             var tmp = new byte[inp.Length];
-            var changedBits = new List<int>();
+            var changedBits = new List<List<byte>>();
             var state = new byte[4, Nb];
             var novel = new byte[inp.Length];
 
@@ -347,7 +347,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             for (int i = 0; i < inp.Length; i++)
                 novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
 
-            changedBits.Add(ChangedBits(inp, novel));
+            changedBits.Add(novel.ToList());
 
             for (int round = 1; round < Nr; round++)
             {
@@ -355,43 +355,44 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
 
                 for (int i = 0; i < inp.Length; i++)
                     novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-                changedBits.Add(ChangedBits(inp, novel));
+                
+                changedBits.Add(novel.ToList());
 
                 state = ShiftRows(state);
 
                 for (int i = 0; i < inp.Length; i++)
                     novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-                changedBits.Add(ChangedBits(inp, novel));
+                changedBits.Add(novel.ToList());
 
                 state = MixColumns(state);
 
                 for (int i = 0; i < inp.Length; i++)
                     novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-                changedBits.Add(ChangedBits(inp, novel));
+                changedBits.Add(novel.ToList());
 
                 state = AddRoundKey(state, w_k, round);
 
                 for (int i = 0; i < inp.Length; i++)
                     novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-                changedBits.Add(ChangedBits(inp, novel));
+                changedBits.Add(novel.ToList());
             }
             state = SubBytes(state);
 
             for (int i = 0; i < inp.Length; i++)
                 novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-            changedBits.Add(ChangedBits(inp, novel));
+            changedBits.Add(novel.ToList());
 
             state = ShiftRows(state);
 
             for (int i = 0; i < inp.Length; i++)
                 novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-            changedBits.Add(ChangedBits(inp, novel));
+            changedBits.Add(novel.ToList());
 
             state = AddRoundKey(state, w_k, Nr);
 
             for (int i = 0; i < inp.Length; i++)
                 novel[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-            changedBits.Add(ChangedBits(inp, novel));
+            changedBits.Add(novel.ToList());
 
             for (int i = 0; i < tmp.Length; i++)
                 tmp[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
@@ -466,47 +467,6 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
 
             return (tmp, changedBits);
         }
-        public static (byte[] s1, byte[] s2, byte[] s3, byte[] s4, byte[] s5) OneRound(byte[] inp, byte[] key)
-        {
-            Nb = 4;
-            Nk = key.Length / 4;
-            Nr = Nk + 6;
-            byte[,] state = new byte[4, Nb];
-
-            byte[] buff1 = new byte[inp.Length];
-            byte[] buff2 = new byte[inp.Length];
-            byte[] buff3 = new byte[inp.Length];
-            byte[] buff4 = new byte[inp.Length];
-            byte[] buff5 = new byte[inp.Length];
-
-            w = generateSubkeys(key);
-
-            for (int i = 0; i < inp.Length; i++)
-                state[i / 4, i % 4] = inp[i % 4 * 4 + i / 4];
-
-            state = AddRoundKey(state, w, 0);
-            for (int i = 0; i < inp.Length; i++)
-                buff1[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-
-            state = SubBytes(state);
-            for (int i = 0; i < inp.Length; i++)
-                buff2[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-
-            state = ShiftRows(state);
-            for (int i = 0; i < inp.Length; i++)
-                buff3[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-
-            state = MixColumns(state);
-            for (int i = 0; i < inp.Length; i++)
-                buff4[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-
-            state = AddRoundKey(state, w, 0);
-
-            for (int i = 0; i < inp.Length; i++)
-                buff5[i % 4 * 4 + i / 4] = state[i / 4, i % 4];
-
-            return (buff1, buff2, buff3, buff4, buff5);
-        }
 
         public static byte[] encryptBC(byte[] inp, byte[] key, byte[] iv = null)
         {
@@ -563,7 +523,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             return tmp;
         }
 
-        public static (byte[] result, List<List<int>> changedBitsBlock) encryptBCEffect(byte[] inp, byte[] key, byte[] iv = null)
+        public static (byte[] result, List<List<List<byte>>> changedBitsBlock) encryptBCEffect(byte[] inp, byte[] key, byte[] iv = null)
         {
             Nb = 4;
             Nk = key.Length / 4;
@@ -585,7 +545,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
             var f_array = new byte[16];
             Array.Copy(iv, 0, f_array, 0, iv.Length);
 
-            var changedBitsBlock = new List<List<int>>();
+            var changedBitsBlock = new List<List<List<byte>>>();
 
             var w_k = generateSubkeys(key);
 
@@ -610,7 +570,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
                     count++;
                 }
             }
-            if (bloc.Length == 16)
+            /*if (bloc.Length == 16)
             {
                 var xorbloc = xor_func(bloc, f_array);
                 var res = encryptBlocEffect(xorbloc, w_k);
@@ -618,7 +578,7 @@ namespace Lab1_Gamming_Srammbling.CryptoClass
                 changedBitsBlock.Add(res.changedBits);
                 Array.Copy(bloc, 0, tmp, i - 16, bloc.Length);
                 f_array = xor_func(bloc, f_array);
-            }
+            }*/
 
             return (tmp, changedBitsBlock);
         }

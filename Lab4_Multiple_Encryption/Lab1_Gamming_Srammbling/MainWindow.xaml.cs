@@ -2,16 +2,21 @@
 using Lab1_Gamming_Srammbling.Models;
 using Lab1_Gamming_Srammbling.Utilitiets;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Lab1_Gamming_Srammbling
 {
+
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            
         }
 
         private string TextFormarFlag = "Text";
@@ -27,6 +32,12 @@ namespace Lab1_Gamming_Srammbling
         private byte[] ChiphrArray = null;
         private byte[] IVArray = null;
         private byte[] SecKeyArray = null;
+        private byte[] EffectText = null;
+        private byte[] NewText = new byte[48];
+        private byte[] EffectKey = null;
+        private byte[] EffectIV = null;
+        private byte[] EffectSecKey = null;
+        private int KeyLenght = 16;
         private bool Flag = true;
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -48,6 +59,7 @@ namespace Lab1_Gamming_Srammbling
                 LoadChiphFile.Margin = new Thickness(LoadChiphFile.Margin.Left, LoadChiphFile.Margin.Top - 100, LoadChiphFile.Margin.Right, LoadChiphFile.Margin.Bottom);
                 Flag = false;
             }
+            
         }
 
         private void TextFormat_DropDownClosed(object sender, EventArgs e)
@@ -109,19 +121,19 @@ namespace Lab1_Gamming_Srammbling
 
         private void UpdateKey_Click(object sender, RoutedEventArgs e)
         {
-            KeyArray = AESClass.RandKey();
+            KeyArray = AESClass.RandKey(KeyLenght);
 
             if (TextFormat.Text == "Text")
             {
-                Key.Text = ConverteUtility.ConvertByteArrayToString(AESClass.RandKey());
+                Key.Text = ConverteUtility.ConvertByteArrayToString(AESClass.RandKey(KeyLenght));
             }
             if (TextFormat.Text == "Binary")
             {
-                Key.Text = ConverteUtility.ConvertByteArraToBinaryStr(AESClass.RandKey());
+                Key.Text = ConverteUtility.ConvertByteArraToBinaryStr(AESClass.RandKey(KeyLenght));
             }
             if (TextFormat.Text == "Hexadecimal")
             {
-                Key.Text = ConverteUtility.ByteArrayToHexString(AESClass.RandKey());
+                Key.Text = ConverteUtility.ByteArrayToHexString(AESClass.RandKey(KeyLenght));
             }
         }
 
@@ -218,7 +230,7 @@ namespace Lab1_Gamming_Srammbling
 
         private void UpdateIV_Click(object sender, RoutedEventArgs e)
         {
-            IVArray = AESClass.RandKey();
+            IVArray = AESClass.RandKey(KeyLenght);
 
             if (TextFormat.Text == "Text")
             {
@@ -287,7 +299,7 @@ namespace Lab1_Gamming_Srammbling
 
         private void UpdateSecKey_Click(object sender, RoutedEventArgs e)
         {
-            SecKeyArray = AESClass.RandKey();
+            SecKeyArray = AESClass.RandKey(KeyLenght);
             if (TextFormat.Text == "Text")
             {
                 SecKey.Text = ConverteUtility.ConvertByteArrayToString(SecKeyArray);
@@ -300,6 +312,94 @@ namespace Lab1_Gamming_Srammbling
             {
                 SecKey.Text = ConverteUtility.ByteArrayToHexString(SecKeyArray);
             }
+        }
+
+        private void GenText_Click(object sender, RoutedEventArgs e)
+        {
+            if (TextArray.Length < 48)
+                MessageBox.Show("Длины текста недостаточно для исследования");
+            else
+            {
+                EffectText = TextArray;
+                Block1Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Take(16).ToArray());
+                Block2Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Skip(16).Take(16).ToArray());
+                Block3Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Skip(32).Take(16).ToArray());
+               
+                if(IVArray != null)
+                    IVEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(IVArray);
+                else
+                    MessageBox.Show("Нет вектора инициализации. Введите его или сгенерируйте");
+                if (KeyArray != null)
+                    KeyEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(KeyArray);
+                else
+                    MessageBox.Show("Нет ключа. Введите его или сгенерируйте");
+            }
+        }
+
+        private void Effect_Click(object sender, RoutedEventArgs e)
+        {
+            var first = AESClass.encryptBCEffect(EffectText, KeyArray, IVArray);
+            var second = AESClass.encryptBCEffect(NewText, KeyArray, IVArray);
+            
+            //*
+            for(int i = 0; i < first.changedBitsBlock.Count; i++)
+            { 
+                for(int j = 0; j < first.changedBitsBlock.ElementAt(i).Count; j++)
+                {
+                    var oldText = first.changedBitsBlock.ElementAt(i).ElementAt(j).ToArray();
+                    var newText = second.changedBitsBlock.ElementAt(i).ElementAt(j).ToArray();
+                    ListOfChanges.Text += AESClass.ChangedBits(oldText, newText).ToString() + " ";
+                }
+                ListOfChanges.Text += "\n";
+            }
+            //*/
+        }
+
+        private void ModBlocks_Click(object sender, RoutedEventArgs e)
+        {
+            var block1 = ConverteUtility.ConvertBinaryStrToByte(Block1Effect.Text);
+            var block2 = ConverteUtility.ConvertBinaryStrToByte(Block2Effect.Text);
+            var block3 = ConverteUtility.ConvertBinaryStrToByte(Block3Effect.Text);
+            
+            Array.Copy(block1, NewText, 16);
+            Array.Copy(block2, 0, NewText, 16, 16);
+            Array.Copy(block3, 0, NewText, 32, 16);
+
+            EffectIV = ConverteUtility.ConvertBinaryStrToByte(IVEffect.Text);
+            EffectKey = ConverteUtility.ConvertBinaryStrToByte(KeyEffect.Text);
+        }
+
+        void UpdateBackPattern(object sender, SizeChangedEventArgs e)
+        {
+            var w = Background.ActualWidth;
+            var h = Background.ActualHeight;
+
+            Background.Children.Clear();
+            for (int x = 10; x < w; x += 10)
+                AddLineToBackground(x, 0, x, h);
+            for (int y = 10; y < h; y += 10)
+                AddLineToBackground(0, y, w, y);
+        }
+
+        void AddLineToBackground(double x1, double y1, double x2, double y2)
+        {
+            var line = new Line()
+            {
+                X1 = x1,
+                Y1 = y1,
+                X2 = x2,
+                Y2 = y2,
+                Stroke = Brushes.Black,
+                StrokeThickness = 1,
+                SnapsToDevicePixels = true
+            };
+            line.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
+            Background.Children.Add(line);
+        }
+
+        private void Test1_Click(object sender, RoutedEventArgs e)
+        {
+            AddLineToBackground(100, 100, 0, 0);
         }
     }
 }
