@@ -53,6 +53,9 @@ namespace Lab1_Gamming_Srammbling
             SecKeyLabel.IsEnabled = false;
             UpdateSecKey.Visibility = Visibility.Hidden;
             UpdateSecKey.IsEnabled = false;
+            SecKeEffect.Visibility = Visibility.Hidden;
+            SecKeEffect.IsEnabled = false;
+            SecKeyLabel_Copy.Visibility = Visibility.Hidden;
             if (Flag == true)
             {
                 ChiphrLabel.Margin = new Thickness(ChiphrLabel.Margin.Left, ChiphrLabel.Margin.Top - 100, ChiphrLabel.Margin.Right, ChiphrLabel.Margin.Bottom);
@@ -263,6 +266,11 @@ namespace Lab1_Gamming_Srammbling
                 SecKeyLabel.IsEnabled = false;
                 UpdateSecKey.Visibility = Visibility.Hidden;
                 UpdateSecKey.IsEnabled = false;
+                SecKeEffect.Visibility = Visibility.Hidden;
+                SecKeEffect.IsEnabled = false;
+                Block2Effect.IsEnabled = true;
+                Block3Effect.IsEnabled = true;
+                SecKeyLabel_Copy.Visibility = Visibility.Hidden;
                 if (Flag == true)
                 {
                     ChiphrLabel.Margin = new Thickness(ChiphrLabel.Margin.Left, ChiphrLabel.Margin.Top - 100, ChiphrLabel.Margin.Right, ChiphrLabel.Margin.Bottom);
@@ -283,6 +291,11 @@ namespace Lab1_Gamming_Srammbling
                 SecKeyLabel.IsEnabled = true;
                 UpdateSecKey.Visibility = Visibility.Visible;
                 UpdateSecKey.IsEnabled = true;
+                SecKeEffect.Visibility = Visibility.Visible;
+                SecKeEffect.IsEnabled = true;
+                Block2Effect.IsEnabled = false;
+                Block3Effect.IsEnabled = false;
+                SecKeyLabel_Copy.Visibility = Visibility.Visible;
                 if (Flag == false)
                 {
                     ChiphrLabel.Margin = new Thickness(ChiphrLabel.Margin.Left, ChiphrLabel.Margin.Top + 100, ChiphrLabel.Margin.Right, ChiphrLabel.Margin.Bottom);
@@ -321,98 +334,188 @@ namespace Lab1_Gamming_Srammbling
 
         private void GenText_Click(object sender, RoutedEventArgs e)
         {
-            if (TextArray.Length < 48)
-                MessageBox.Show("Длины текста недостаточно для исследования");
+            if (ChiphrMod.Text == "BC")
+            {
+                if (TextArray == null || TextArray.Length < 48)
+                    MessageBox.Show("Длины текста недостаточно для исследования");
+                else
+                {
+                    if (EffectMod.Text == "Шифрование")
+                        EffectText = TextArray;
+                    else
+                        EffectText = TextArray.Take(48).ToArray();
+
+
+
+                    Block1Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Take(16).ToArray());
+                    Block2Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Skip(16).Take(16).ToArray());
+                    Block3Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Skip(32).Take(16).ToArray());
+
+
+                    if (IVArray != null)
+                        IVEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(IVArray);
+                    else
+                        MessageBox.Show("Нет вектора инициализации. Введите его или сгенерируйте");
+
+                    if (KeyArray != null)
+                        KeyEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(KeyArray);
+                    else
+                        MessageBox.Show("Нет ключа. Введите его или сгенерируйте");
+                }
+            }
             else
             {
-                EffectText = TextArray;
-                Block1Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Take(16).ToArray());
-                Block2Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Skip(16).Take(16).ToArray());
-                Block3Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Skip(32).Take(16).ToArray());
-               
-                if(IVArray != null)
-                    IVEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(IVArray);
+                if (TextArray == null || TextArray.Length < 16)
+                    MessageBox.Show("Длины текста недостаточно для исследования11");
                 else
-                    MessageBox.Show("Нет вектора инициализации. Введите его или сгенерируйте");
-                if (KeyArray != null)
-                    KeyEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(KeyArray);
-                else
-                    MessageBox.Show("Нет ключа. Введите его или сгенерируйте");
+                {
+                    if (EffectMod.Text == "Шифрование")
+                        EffectText = TextArray;
+                    else
+                        EffectText = TextArray.Take(16).ToArray();
+
+                    Block1Effect.Text = ConverteUtility.ConvertByteArraToBinaryStr(EffectText.Take(16).ToArray());
+
+                    if (IVArray != null)
+                        IVEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(IVArray);
+                    else
+                        MessageBox.Show("Нет вектора инициализации. Введите его или сгенерируйте");
+
+                    if (KeyArray != null)
+                        KeyEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(KeyArray);
+                    else
+                        MessageBox.Show("Нет ключа. Введите его или сгенерируйте");
+
+                    if (SecKeyArray != null)
+                        SecKeEffect.Text = ConverteUtility.ConvertByteArraToBinaryStr(SecKeyArray);
+                    else
+                        MessageBox.Show("Нет вторичного ключа. Введите его или сгенерируйте");
+                }
             }
+
         }
 
         private void Effect_Click(object sender, RoutedEventArgs e)
         {
-            var first = AESClass.encryptBCEffect(EffectText, KeyArray, IVArray);
-            var second = AESClass.encryptBCEffect(NewText, KeyArray, IVArray);
-            ChangedBitsList.Clear();
-            
-            for (int i = 0; i < first.changedBitsBlock.Count; i++)
-            { 
-                for(int j = 0; j < first.changedBitsBlock.ElementAt(i).Count; j++)
+            var first = new List<List<List<byte>>>();
+            var second = new List<List<List<byte>>>();
+
+            if (ChiphrMod.Text == "BC")
+            {
+                if (EffectMod.Text == "Шифрование")
                 {
-                    var oldText = first.changedBitsBlock.ElementAt(i).ElementAt(j).ToArray();
-                    var newText = second.changedBitsBlock.ElementAt(i).ElementAt(j).ToArray();
+                    first = AESClass.encryptBCEffect(EffectText, KeyArray, IVArray).changedBitsBlock;
+                    second = AESClass.encryptBCEffect(NewText, EffectKey, EffectIV).changedBitsBlock;
+                }
+                else
+                {
+                    first = AESClass.decryptBCEffect(EffectText, KeyArray, IVArray).changedBitsBlock;
+                    second = AESClass.decryptBCEffect(NewText, EffectKey, EffectIV).changedBitsBlock;
+                }
+            }
+            else
+            {
+                first = AESClass.encryptDevisPriceEffect(EffectText, KeyArray, IVArray, SecKeyArray).changedBitsBlock;
+                second = AESClass.encryptDevisPriceEffect(NewText, EffectKey, EffectIV, EffectSecKey).changedBitsBlock;
+            }
+
+            ChangedBitsList.Clear();
+
+            for (int i = 0; i < first.Count; i++)
+            { 
+                for(int j = 0; j < first.ElementAt(i).Count; j++)
+                {
+                    var oldText = first.ElementAt(i).ElementAt(j).ToArray();
+                    var newText = second.ElementAt(i).ElementAt(j).ToArray();
                     ChangedBitsList.Add(AESClass.ChangedBits(oldText, newText));
                 }
             }
+
+            DataContext = null;
+            if (ChiphrMod.Text == "BC")
+            {
+                var v1 = new ChartValues<ObservablePoint>();
+                var v2 = new ChartValues<ObservablePoint>();
+                var v3 = new ChartValues<ObservablePoint>();
+
+                for (int i = 0; i < 16; i++)
+                {
+                    v1.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i)));
+                    v2.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i + 16)));
+                    v3.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i + 32)));
+                }
+
+
+                SeriesCollection = new SeriesCollection
+                {
+                    new LineSeries
+                    {
+                        Values = v1,
+                        Stroke = Brushes.Red,
+                        Title = "Block 1"
+                    },
+                    new LineSeries
+                    {
+                        Values = v2,
+                        Stroke = Brushes.Green,
+                        Title = "Block 2"
+                    },
+
+                    new LineSeries
+                    {
+                        Values = v3,
+                        Stroke = Brushes.Blue,
+                        Title = "Block 3"
+                    }
+                };
+            }
+            else
+            {
+                var v1 = new ChartValues<ObservablePoint>();
+
+                for (int i = 0; i < 16; i++)
+                    v1.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i)));
+
+
+                SeriesCollection = new SeriesCollection
+                {
+                    new LineSeries
+                    {
+                        Values = v1,
+                        Stroke = Brushes.Red,
+                        Title = "Block 1"
+                    }
+                };
+            }
+            DataContext = this;
         }
 
         private void ModBlocks_Click(object sender, RoutedEventArgs e)
         {
-            var block1 = ConverteUtility.ConvertBinaryStrToByte(Block1Effect.Text);
-            var block2 = ConverteUtility.ConvertBinaryStrToByte(Block2Effect.Text);
-            var block3 = ConverteUtility.ConvertBinaryStrToByte(Block3Effect.Text);
-            
-            Array.Copy(block1, NewText, 16);
-            Array.Copy(block2, 0, NewText, 16, 16);
-            Array.Copy(block3, 0, NewText, 32, 16);
+            if (Block1Effect.Text != "")
+            {
+                if (ChiphrMod.Text == "BC")
+                {
+                    var block1 = ConverteUtility.ConvertBinaryStrToByte(Block1Effect.Text);
+                    var block2 = ConverteUtility.ConvertBinaryStrToByte(Block2Effect.Text);
+                    var block3 = ConverteUtility.ConvertBinaryStrToByte(Block3Effect.Text);
+                    Array.Copy(block1, NewText, 16);
+                    Array.Copy(block2, 0, NewText, 16, 16);
+                    Array.Copy(block3, 0, NewText, 32, 16);
+                }
+                else
+                {
+                    NewText = ConverteUtility.ConvertBinaryStrToByte(Block1Effect.Text);
+                }
+               
+                EffectIV = ConverteUtility.ConvertBinaryStrToByte(IVEffect.Text);
+                EffectKey = ConverteUtility.ConvertBinaryStrToByte(KeyEffect.Text);
 
-            EffectIV = ConverteUtility.ConvertBinaryStrToByte(IVEffect.Text);
-            EffectKey = ConverteUtility.ConvertBinaryStrToByte(KeyEffect.Text);
+                if (ChiphrMod.Text != "BC")
+                    EffectSecKey = ConverteUtility.ConvertBinaryStrToByte(SecKeEffect.Text);
+            }
         }
         
         public SeriesCollection SeriesCollection { get; set; }
-        public Func<double, string> Test { get; set; }
-
-        private void Test1_Click(object sender, RoutedEventArgs e)
-        {
-            DataContext = null;
-            var v1 = new ChartValues<ObservablePoint>();
-            var v2 = new ChartValues<ObservablePoint>();
-            var v3 = new ChartValues<ObservablePoint>();
-
-            for(int i = 0; i < 16; i++)
-            {
-                v1.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i)));
-                v2.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i + 16)));
-                v3.Add(item: new ObservablePoint(x: i, y: ChangedBitsList.ElementAt(i + 32)));
-            }
-
-            SeriesCollection = new SeriesCollection
-            {
-                new LineSeries
-                {
-                    Values = v1,
-                    Stroke = Brushes.Red,
-                    Title = "Block 1"                    
-                },
-
-                new LineSeries
-                {
-                    Values = v2,
-                    Stroke = Brushes.Green,
-                    Title = "Block 2"
-                },
-
-                new LineSeries
-                {
-                    Values = v3,
-                    Stroke = Brushes.Blue,
-                    Title = "Block 3"
-                }
-            };
-            DataContext = this;
-        }
     }
 }

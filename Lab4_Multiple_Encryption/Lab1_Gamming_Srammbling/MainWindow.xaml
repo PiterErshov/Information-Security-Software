@@ -6,7 +6,7 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:Lab1_Gamming_Srammbling"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1600">
+        Title="MainWindow" Height="1000" Width="1600">
     <Grid Margin="0,0,0,6" Loaded="Grid_Loaded">
         <TextBox x:Name="Text" HorizontalAlignment="Left" Margin="64,144,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="351" Height="52" TextChanged="Text_TextChanged"/>
         <TextBox x:Name="Key" HorizontalAlignment="Left" Margin="64,378,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Height="50" TextChanged="Key_TextChanged"/>
@@ -37,26 +37,29 @@
         <Button x:Name="UpdateSecKey" Content="Обновить вторичный ключ" HorizontalAlignment="Left" Margin="250,455,0,0" VerticalAlignment="Top" Click="UpdateSecKey_Click" Width="165"/>
         <Label x:Name="SecKeyLabel" Content="Вторичный ключ" HorizontalAlignment="Left" Margin="63,447,0,0" VerticalAlignment="Top"/>
         <Label Content="Режим шифрования" HorizontalAlignment="Left" Margin="287,27,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="Block1Effect" HorizontalAlignment="Left" Margin="489,65,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="584" Height="50" TextChanged="Text_TextChanged"/>
-        <TextBox x:Name="KeyEffect" HorizontalAlignment="Left" Margin="492,443,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="396" Height="25" TextChanged="Key_TextChanged"/>
-        <Label Content="Блок 1" HorizontalAlignment="Left" Margin="491,30,0,0" VerticalAlignment="Top"/>
-        <Label Content="Ключ" HorizontalAlignment="Left" Margin="492,404,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="IVEffect" HorizontalAlignment="Left" Margin="494,367,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="394" Height="25" TextChanged="Key_TextChanged"/>
-        <Label Content="Вектор инициализации" HorizontalAlignment="Left" Margin="494,328,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="SecKeEffect" HorizontalAlignment="Left" Margin="492,530,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="396" Height="25"/>
-        <Label x:Name="SecKeyLabel_Copy" Content="Вторичный ключ" HorizontalAlignment="Left" Margin="492,490,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="ListOfChanges" HorizontalAlignment="Left" Margin="463,624,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Height="140"/>
-        <Button x:Name="GenText" Content="Подгрузить данные" HorizontalAlignment="Left" Margin="919,36,0,0" VerticalAlignment="Top" Width="155" Click="GenText_Click"/>
-        <Button x:Name="Effect" Content="Исследовать" HorizontalAlignment="Left" Margin="730,577,0,0" VerticalAlignment="Top" Click="Effect_Click"/>
-        <TextBox x:Name="Block2Effect" HorizontalAlignment="Left" Margin="490,148,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="584" Height="48" TextChanged="Text_TextChanged"/>
-        <TextBox x:Name="Block3Effect" HorizontalAlignment="Left" Margin="489,226,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="584" Height="48" TextChanged="Text_TextChanged"/>
-        <Label Content="Блок 2" HorizontalAlignment="Left" Margin="492,120,0,0" VerticalAlignment="Top"/>
-        <Label Content="Блок 3" HorizontalAlignment="Left" Margin="491,200,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="ModBlocks" Content="Модифицировать данные" HorizontalAlignment="Left" Margin="919,300,0,0" VerticalAlignment="Top" Width="155" Click="ModBlocks_Click"/>
-        <Grid x:Name="GraphGrid" Margin="919,372,70,75">
+        <TextBox x:Name="Block1Effect" HorizontalAlignment="Left" Margin="489,95,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="584" Height="50" TextChanged="Text_TextChanged"/>
+        <TextBox x:Name="KeyEffect" HorizontalAlignment="Left" Margin="494,509,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="396" Height="50" TextChanged="Key_TextChanged"/>
+        <Label Content="Блок 1" HorizontalAlignment="Left" Margin="491,60,0,0" VerticalAlignment="Top"/>
+        <Label Content="Ключ" HorizontalAlignment="Left" Margin="494,469,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="IVEffect" HorizontalAlignment="Left" Margin="494,397,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="394" Height="54" TextChanged="Key_TextChanged"/>
+        <Label Content="Вектор инициализации" HorizontalAlignment="Left" Margin="494,358,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="SecKeEffect" HorizontalAlignment="Left" Margin="495,621,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="396" Height="59"/>
+        <Label x:Name="SecKeyLabel_Copy" Content="Вторичный ключ" HorizontalAlignment="Left" Margin="495,581,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="GenText" Content="Подгрузить данные" HorizontalAlignment="Left" Margin="919,66,0,0" VerticalAlignment="Top" Width="155" Click="GenText_Click"/>
+        <Button x:Name="Effect" Content="Исследовать" HorizontalAlignment="Left" Margin="817,708,0,0" VerticalAlignment="Top" Click="Effect_Click"/>
+        <TextBox x:Name="Block2Effect" HorizontalAlignment="Left" Margin="490,178,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="584" Height="48" TextChanged="Text_TextChanged"/>
+        <TextBox x:Name="Block3Effect" HorizontalAlignment="Left" Margin="489,256,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="584" Height="48" TextChanged="Text_TextChanged"/>
+        <Label Content="Блок 2" HorizontalAlignment="Left" Margin="492,150,0,0" VerticalAlignment="Top"/>
+        <Label Content="Блок 3" HorizontalAlignment="Left" Margin="491,230,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="ModBlocks" Content="Модифицировать данные" HorizontalAlignment="Left" Margin="919,330,0,0" VerticalAlignment="Top" Width="155" Click="ModBlocks_Click"/>
+        <Grid x:Name="GraphGrid" Margin="919,402,70,45">
             <lvc:CartesianChart x:Name="ChartBlock" Series="{Binding SeriesCollection}" LegendLocation="Right" Margin="0,0,10,19"/>
         </Grid>
-        <Button x:Name="Test1" Content="Button" HorizontalAlignment="Left" Margin="1338,306,0,0" VerticalAlignment="Top" Click="Test1_Click"/>
+        <ComboBox x:Name="EffectMod" HorizontalAlignment="Left" Margin="1103,101,0,0" VerticalAlignment="Top" Width="127" SelectedIndex="0" DropDownClosed="ChiphrMod_DropDownClosed">
+            <TextBlock><Run Text="Шифрование"/></TextBlock>
+            <TextBlock><Run Text="Дешифрование"/></TextBlock>
+        </ComboBox>
+        <Label Content="Тип Исследования" HorizontalAlignment="Left" Margin="1103,66,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
