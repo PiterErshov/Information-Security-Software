@@ -1,0 +1,22 @@
+﻿<Window x:Class="Lab1_Gamming_Srammbling.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab1_Gamming_Srammbling"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="400">
+    <Grid Margin="0,0,0,6" Loaded="Grid_Loaded">
+        <TextBox x:Name="AESText" HorizontalAlignment="Left" Margin="43,82,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="34"/>
+        <TextBox x:Name="AESKey" HorizontalAlignment="Left" Margin="43,144,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="41"/>
+        <TextBox x:Name="S1" HorizontalAlignment="Left" Margin="43,208,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="40"/>
+        <TextBox x:Name="S2" HorizontalAlignment="Left" Margin="43,265,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="40"/>
+        <TextBox x:Name="S3" HorizontalAlignment="Left" Margin="43,331,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="40"/>
+        <TextBox x:Name="S4" HorizontalAlignment="Left" Margin="43,389,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="40"/>
+        <TextBox x:Name="S5" HorizontalAlignment="Left" Margin="43,451,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="318" Height="40"/>
+        <Button x:Name="AESRUN" Content="AES" HorizontalAlignment="Left" Margin="43,515,0,0" VerticalAlignment="Top" Width="157" Click="AESRUN_Click"/>
+        <Label Content="Текст" HorizontalAlignment="Left" Margin="54,57,0,0" VerticalAlignment="Top"/>
+        <Label Content="Ключ" HorizontalAlignment="Left" Margin="43,121,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
